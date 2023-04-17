@@ -1,0 +1,8 @@
+rootProject.name = "LAB6"
+include 'Model'
+include 'Persistence'
+include 'Services'
+include 'Server'
+include 'Networking'
+include 'ClientFX'
+include 'ClientFXGood'

@@ -50,7 +50,10 @@ public class ServicesObjectProxy implements IService {
 
     private void handleUpdate(UpdateResponse update){
         if (update instanceof MakeDonationResponse) {
-            this.client.donationReceived();
+            MakeDonationResponse makeDonationResponse = (MakeDonationResponse)update;
+            CaseDTO selectedCase = makeDonationResponse.getSelectedCase();
+            double amountDonated = makeDonationResponse.getAmountDonated();
+            this.client.donationReceived(selectedCase, amountDonated);
         }
     }
 
@@ -117,7 +120,6 @@ public class ServicesObjectProxy implements IService {
     private Response readResponse() {
         Response response=null;
         try{
-
             response=qresponses.take();
 
         } catch (InterruptedException e) {
@@ -166,8 +168,16 @@ public class ServicesObjectProxy implements IService {
         return donationList;
     }
 
-    public Iterable<Donor> getAllDonors() {
-        return null;
+    public Iterable<Donor> getAllDonors() throws ServiceException{
+        this.sendRequest(new GetAllDonorsRequest());
+        Response response = this.readResponse();
+        if (response instanceof  ErrorResponse) {
+            ErrorResponse errorResponse = (ErrorResponse)response;
+            throw new ServiceException(errorResponse.getMessage());
+        }
+        GetAllDonorsResponse donorsResponse = (GetAllDonorsResponse) response;
+        List<Donor> donorList = donorsResponse.getDonorList();
+        return donorList;
     }
     public void makeDonation(CaseDTO selectedCase, String donorName, String donorAddress, String donorPhone, double amountDonated) throws ServiceException{
         this.sendRequest(new MakeDonationRequest(selectedCase, donorName, donorAddress, donorPhone, amountDonated));

@@ -1,8 +1,11 @@
-module com.example.clientfx {
+module com.example.controllers {
     requires javafx.controls;
     requires javafx.fxml;
+    requires LAB6.Services.main;
+    requires LAB6.Networking.main;
+    requires LAB6.Model.main;
 
 
-    opens com.example.prevclient to javafx.fxml;
-    exports com.example.prevclient;
+    exports com.example.clientfxgood;
+    opens com.example.clientfxgood to javafx.fxml;
 }

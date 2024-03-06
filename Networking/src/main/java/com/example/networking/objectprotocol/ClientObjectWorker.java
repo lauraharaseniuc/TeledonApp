@@ -3,10 +3,7 @@ package com.example.networking.objectprotocol;
 import com.example.services.IService;
 import com.example.services.ITeledonObserver;
 import com.example.services.ServiceException;
-import model.Case;
-import model.CaseDTO;
-import model.Donation;
-import model.Volunteer;
+import model.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -111,8 +108,17 @@ public class ClientObjectWorker implements Runnable, ITeledonObserver {
                 String donorPhone = makeDonationRequest.getDonorPhone();
                 double amountDonated = makeDonationRequest.getAmountDonated();
                 server.makeDonation(selectedCase,donorName,donorAddress,donorPhone,amountDonated);
-                return new MakeDonationResponse();
+                return new OkResponse();
             } catch(ServiceException ex) {
+                return new ErrorResponse(ex.getMessage());
+            }
+        } else if (request instanceof GetAllDonorsRequest) {
+            System.out.println("Get all donors request");
+            GetAllDonorsRequest donorsRequest = (GetAllDonorsRequest) request;
+            try {
+                List<Donor> donorList = (List<Donor>) server.getAllDonors();
+                return new GetAllDonorsResponse(donorList);
+            } catch (ServiceException ex) {
                 return new ErrorResponse(ex.getMessage());
             }
         }
@@ -125,11 +131,12 @@ public class ClientObjectWorker implements Runnable, ITeledonObserver {
             output.writeObject(response);
             output.flush();
         }
+        System.out.println("SENT...");
     }
 
-    public void donationReceived() {
+    public void donationReceived(CaseDTO selectedCase, double amountDonated) {
         try {
-            sendResponse(new MakeDonationResponse());
+            sendResponse(new MakeDonationResponse(selectedCase, amountDonated));
         } catch (IOException ex) {
             ex.printStackTrace();
         }

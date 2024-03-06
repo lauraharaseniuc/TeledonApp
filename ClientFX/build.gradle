@@ -24,8 +24,8 @@ tasks.withType(JavaCompile) {
 }
 
 application {
-    mainModule = 'com.example'
-    mainClass = 'com.example.HelloApplication.java'
+    mainModule = 'com.example.clientfxgood'
+    mainClass = 'com.example.clientfxgood.HelloApplication'
 }
 
 javafx {
@@ -35,6 +35,7 @@ javafx {
 
 dependencies {
     implementation project (':Services')
+    implementation project (':Networking')
     implementation project (':Model')
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
@@ -54,10 +55,6 @@ jlink {
 
 jlinkZip {
     group = 'distribution'
-}
-
-task wrapper(type: Wrapper){
-    gradleVersion = '7.2'
 }
 
 task prepareKotlinBuildScriptModel {

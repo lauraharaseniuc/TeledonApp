@@ -152,7 +152,6 @@ public class VolunteerSessionController implements ITeledonObserver {
         double amountDonatedAsDouble = Double.parseDouble(amountDonated);
         try {
             this.server.makeDonation(selectedCase, donorName, donorAddress, donorPhone, amountDonatedAsDouble);
-            this.initializeCaseTableView();
         } catch (ServiceException ex) {
             this.errorLabel.setText(ex.getMessage());
         }
@@ -183,7 +182,12 @@ public class VolunteerSessionController implements ITeledonObserver {
             this.errorLabel.setTextFill(Color.RED);
             return;
         }
-        List<Donor> donors= (List<Donor>) this.server.getAllDonors();
+        List<Donor> donors = new ArrayList<>();
+        try {
+            donors= (List<Donor>) this.server.getAllDonors();
+        } catch (ServiceException ex) {
+           this.errorLabel.setText(ex.getMessage());
+        }
         List<Donor> filteredDonors = new ArrayList<>();
         donors.forEach((donor) -> {
             if (donor.getName().toLowerCase().contains(donorName.toLowerCase())) {
@@ -198,7 +202,14 @@ public class VolunteerSessionController implements ITeledonObserver {
         stage.close();
     }
 
-    public void donationReceived() {
-        this.initializeCaseTableView();
+    public void donationReceived(CaseDTO selectedCase, double amountDonated) {
+        //System.out.println(selectedCase.getDescription());
+        int caseIndex = this.casesTable.getItems().indexOf(selectedCase);
+        selectedCase.addToRaisedSum(amountDonated);
+        String newFormat = selectedCase.formatCaseDTO();
+        selectedCase.setFormatted(newFormat);
+        System.out.println(newFormat);
+
+        this.casesTable.getItems().set(caseIndex,selectedCase);
     }
 }

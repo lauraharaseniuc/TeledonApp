@@ -46,7 +46,7 @@ public class ServiceImplementation implements IService {
         return volunteerOptional;
     }
 
-    public synchronized Iterable<Case> getAllCases() throws ServiceException{
+    public synchronized Iterable<Case> getAllCases(){
         return this.caseRepository.getAll();
     }
     public synchronized Iterable<Donation> getAllDonations() {
@@ -58,7 +58,7 @@ public class ServiceImplementation implements IService {
     }
 
     private final int defaultThreadsNo=5;
-    public void makeDonation(CaseDTO selectedCase, String donorName, String donorAddress, String donorPhone, double amountDonated) {
+    public synchronized void makeDonation(CaseDTO selectedCase, String donorName, String donorAddress, String donorPhone, double amountDonated) {
         Donor donor = this.donorRepository.addDonor(donorName, donorAddress, donorPhone);
         Integer caseId=selectedCase.getId();
         this.donationRepository.add(new Donation(new Case(caseId), donor, amountDonated));
@@ -67,9 +67,10 @@ public class ServiceImplementation implements IService {
         for (HashMap.Entry<Integer, ITeledonObserver> entry: this.loggedVolunteers.entrySet()) {
             ITeledonObserver observer = entry.getValue();
             executor.execute(() -> {
-                observer.donationReceived();
+                observer.donationReceived(selectedCase, amountDonated);
             });
         }
+        executor.shutdown();
     }
 
     public void volunteerLogOut (Volunteer volunteerLoggedIn, ITeledonObserver teledonObserver) {

@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class CaseDTO implements Entity<Integer>, Serializable {
     private Integer id;
@@ -10,9 +11,17 @@ public class CaseDTO implements Entity<Integer>, Serializable {
     private double necessaryAmount;
     private String formatted;
 
-    private String formatCaseDTO() {
+    public String formatCaseDTO() {
         return "Beneficiar: "+this.getPersonInNeed()+"                        "+this.getRaisedSum()+" / "
                 +this.getNecessaryAmount()+"\n"+this.getDescription();
+    }
+
+    public void addToRaisedSum (double sumToAdd) {
+        this.raisedSum += sumToAdd;
+    }
+
+    public void setFormatted(String formatted) {
+        this.formatted = formatted;
     }
 
     public CaseDTO(Integer id, String description, String personInNeed, double raisedSum, double necessaryAmount) {
@@ -49,8 +58,21 @@ public class CaseDTO implements Entity<Integer>, Serializable {
         return this.id;
     }
 
+
     @Override
     public void setId(Integer integer) {
         this.id=integer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CaseDTO caseDTO)) return false;
+        return getId().equals(caseDTO.getId()) && Objects.equals(getDescription(), caseDTO.getDescription()) && Objects.equals(getPersonInNeed(), caseDTO.getPersonInNeed()) && Objects.equals(getFormatted(), caseDTO.getFormatted());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getDescription(), getPersonInNeed(), getRaisedSum(), getNecessaryAmount(), getFormatted());
     }
 }
